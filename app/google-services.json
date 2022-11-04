@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "914365683322",
+    "project_id": "paseo-viernes-2ae87",
+    "storage_bucket": "paseo-viernes-2ae87.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914365683322:android:1daf268b23881e35124dc3",
+        "android_client_info": {
+          "package_name": "com.ladeus.paseo_viernes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "914365683322-8ecuuchlm00gd4b08otr2dprp0jbt3h4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApxGliO9gz6Y0q-VuXouvwbJkl-RKxc8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "914365683322-8ecuuchlm00gd4b08otr2dprp0jbt3h4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
