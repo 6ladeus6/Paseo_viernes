@@ -117,6 +117,77 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    public void Eliminar(View view){
+        if (sw == 0){
+            Toast.makeText(this, "Para modificar debe primero consultar", Toast.LENGTH_SHORT).show();
+            jetcodigo.requestFocus();
+        }
+        else{
+            codigo=jetcodigo.getText().toString();
+            if (codigo.isEmpty()){
+                Toast.makeText(this, "El codigo es requerido", Toast.LENGTH_SHORT).show();
+                jetcodigo.requestFocus();
+            }
+            else {
+                // Create a new user with a first and last name
+                db.collection("factura").document(codigoId)
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MainActivity.this,"Documento eliminado correctmente...",Toast.LENGTH_SHORT).show();
+                                Limpiar_Campos();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MainActivity.this,"Error elminando documento...",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
+    }
+    public void Anular(View view){
+        if (sw == 0){
+            Toast.makeText(this, "Para modificar debe primero consultar", Toast.LENGTH_SHORT).show();
+            jetcodigo.requestFocus();
+        }
+        else{
+            codigo=jetcodigo.getText().toString();
+            nombre=jetnombre.getText().toString();
+            ciudad=jetciudad.getText().toString();
+            cantidad=jetcantidad.getText().toString();
+            if (codigo.isEmpty() || nombre.isEmpty() || ciudad.isEmpty() || cantidad.isEmpty()){
+                Toast.makeText(this, "Todos los datos requeridos", Toast.LENGTH_SHORT).show();
+                jetcodigo.requestFocus();
+            }
+            else {
+                // Create a new user with a first and last name
+                Map<String, Object> user = new HashMap<>();
+                user.put("Codigo", codigo);
+                user.put("Nombre", nombre);
+                user.put("Ciudad", ciudad);
+                user.put("Cantidad", cantidad);
+                user.put("Activo", "No");
+                db.collection("factura").document(codigoId)
+                        .set(user)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MainActivity.this,"Documento anulado correctmente...",Toast.LENGTH_SHORT).show();
+                                Limpiar_Campos();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MainActivity.this,"Error anulando documento...",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
+    }
 
 
     private void Limpiar_Campos(){
@@ -125,14 +196,16 @@ public class MainActivity extends AppCompatActivity {
         jetciudad.setText("");
         jetcantidad.setText("");
         jetcodigo.requestFocus();
+        jcactivo.setChecked(false);
         sw = 0;
     }
-    public void Consultar(View view) {
-        codigo = jetcodigo.getText().toString();
-        if (codigo.isEmpty()) {
-            Toast.makeText(this, "El codigo es requerido para buscar", Toast.LENGTH_SHORT).show();
+    public void Consultar(View view){
+        codigo=jetcodigo.getText().toString();
+        if (codigo.isEmpty()){
+            Toast.makeText(this, "Codigo es requerido", Toast.LENGTH_SHORT).show();
             jetcodigo.requestFocus();
-        }else{
+        }
+        else{
             db.collection("factura")
                     .whereEqualTo("Codigo",codigo)
                     .get()
@@ -140,21 +213,23 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
-                                sw = 1;
+                                sw=1;
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    //Log.d(TAG, document.getId() + " => " + document.getData());
-                                    codigoId = document.getId();
-                                    jetnombre.setText(document.getString("Nombre"));
-                                    jetciudad.setText(document.getString("Ciudad"));
-                                    jetcantidad.setText(document.getString("Cantidad"));
-                                    if (document.getString("Activo").equals("Si")){
+                                    if (document.getString("Activo").equals("No")){
+                                        Toast.makeText(MainActivity.this, "Documento existe pero esta anulado", Toast.LENGTH_SHORT).show();
+                                        Limpiar_Campos();
+                                    }
+                                    else {
+                                        codigoId = document.getId();
+                                        jetnombre.setText(document.getString("Nombre"));
+                                        jetciudad.setText(document.getString("Ciudad"));
+                                        jetcantidad.setText(document.getString("Cantidad"));
                                         jcactivo.setChecked(true);
-                                    }else{
-                                        jcactivo.setChecked(false);
+                                        //Log.d(TAG, document.getId() + " => " + document.getData());
                                     }
                                 }
                             } else {
-                                Toast.makeText(MainActivity.this, "El codigo no existe", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Documento no existe", Toast.LENGTH_SHORT).show();
                                 //Log.w(TAG, "Error getting documents.", task.getException());
                             }
                         }
