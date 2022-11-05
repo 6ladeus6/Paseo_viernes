@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox jcactivo;
     String codigo,nombre,ciudad,cantidad,codigoId;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    byte  sw;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         jetciudad = findViewById(R.id.etciudad);
         jetcantidad = findViewById(R.id.etcantidad);
         jcactivo = findViewById(R.id.cbactivo);
+        sw = 0;
     }
     public  void Adicionar(View view){
         codigo = jetcodigo.getText().toString();
@@ -74,12 +76,56 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    public void Modificar(View view){
+        if (sw == 0){
+            Toast.makeText(this, "Para modificar debe primero consultar", Toast.LENGTH_SHORT).show();
+            jetcodigo.requestFocus();
+        }
+        else{
+            codigo=jetcodigo.getText().toString();
+            nombre=jetnombre.getText().toString();
+            ciudad=jetciudad.getText().toString();
+            cantidad=jetcantidad.getText().toString();
+            if (codigo.isEmpty() || nombre.isEmpty() || ciudad.isEmpty() || cantidad.isEmpty()){
+                Toast.makeText(this, "Todos los datos requeridos", Toast.LENGTH_SHORT).show();
+                jetcodigo.requestFocus();
+            }
+            else {
+                // Create a new user with a first and last name
+                Map<String, Object> user = new HashMap<>();
+                user.put("Codigo", codigo);
+                user.put("Nombre", nombre);
+                user.put("Ciudad", ciudad);
+                user.put("Cantidad", cantidad);
+                user.put("Activo", "Si");
+                db.collection("factura").document(codigoId)
+                        .set(user)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MainActivity.this,"Estudiante actualizado correctmente...",Toast.LENGTH_SHORT).show();
+                                Limpiar_Campos();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MainActivity.this,"Error actualizando estudiante...",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
+    }
+
+
     private void Limpiar_Campos(){
         jetcodigo.setText("");
         jetnombre.setText("");
         jetciudad.setText("");
         jetcantidad.setText("");
         jetcodigo.requestFocus();
+        sw = 0;
     }
     public void Consultar(View view) {
         codigo = jetcodigo.getText().toString();
@@ -94,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
+                                sw = 1;
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     //Log.d(TAG, document.getId() + " => " + document.getData());
                                     codigoId = document.getId();
